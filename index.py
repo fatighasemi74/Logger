@@ -1,20 +1,13 @@
 import logging
-from logging.handlers import RotatingFileHandler
+from logging import StreamHandler, Formatter, LoggerAdapter
+import os
 
+logger = logging.getLogger("root")
+consoleHandler = StreamHandler()
+consoleHandler.setFormatter(Formatter("%(asctime)s - %(pid)s - %(org_name)s - %(levelname)s - %(message)s"))
+logger.addHandler(consoleHandler)
 
-logger = logging.getLogger("my_logger")
-logger.setLevel(logging.INFO)
+loggerAdapter = LoggerAdapter(logger, extra={"org_name": "Name", "pid": os.getpid()})
 
-fileHandler = RotatingFileHandler("test.log", maxBytes=1024, backupCount=100)
-fileFormatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-fileHandler.setFormatter(fileFormatter)
-
-logger.addHandler(fileHandler)
-
-logger.info("info log")
-logger.warning("this is warning log")
-
-try:
-    x = 1/0
-except Exception as e:
-    logger.error("some error occured", exc_info=e)
+loggerAdapter.warning("hello warning")
+loggerAdapter.warning("hello2 warning")
