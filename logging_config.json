@@ -6,7 +6,7 @@
             "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         },
         "detailed": {
-            "format": "%(asctime)s - %(name)s - [%(levelname)s] - %(pathname)s:%(lineno)s - %(message)s",
+            "format": "%(asctime)s - %(name)s - [%(levelname)s] - %(pathname)s:%(lineno)s - %(message)s - request_id: %(request_id)s",
             "datefmt": "%Y-%m-%d %H:%M:%S"
         }
     },
@@ -20,10 +20,12 @@
         "file": {
             "level": "DEBUG",
             "formatter": "detailed",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": "debug.log",
-            "mode": "w",
-            "encoding": "utf-8"
+            "mode": "a",
+            "encoding": "utf-8",
+            "maxBytes": 1024,
+            "backupCount": 3
         }
     },
     "loggers": {
