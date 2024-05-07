@@ -1,19 +1,36 @@
-from fastapi import FastAPI
+import json
+import logging
+import logging.config
+from fastapi import FastAPI, HTTPException
 from logger import logger
-from middleware import log_middleware
 from starlette.middleware.base import BaseHTTPMiddleware
-import asyncio
+
+# load logging configuration
+with open('logging_config.json', 'r') as config_file:
+    logging_config = json.load(config_file)
+logging.config.dictConfig(logging_config)
+
+# create logger
+logger = logging.getLogger("my_app")
 
 app = FastAPI()
-app.add_middleware(BaseHTTPMiddleware, dispatch=log_middleware)
-logger.info('starting app........')
-
 
 @app.get("/")
-async def index() -> dict:
-    return {'message': 'hello'}
+async def read_root():
+    try:
+        logger.info("Root endpoint was called")
+        return {"hello": "world"}
+    except Exception as e:
+        logger.exception("an error occurred in the root endpoint")
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/upload-videos")
-async def index() -> dict:
-    await asyncio.sleep(1.5)
-    return {'message': 'upload videos'}
+@app.get("/item/{item_id}")
+def read_item(item_id: int):
+    try:
+        logger.debug(f"item endpoint was called with item_id: {item_id}")
+        return {"item_id": item_id}
+    except Exception as e:
+        logger.exception(f"an error occurred in the item endpoint for item_id: {item_id}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
