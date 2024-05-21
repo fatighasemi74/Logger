@@ -24,14 +24,29 @@ class Item(BaseModel):
     price: float
     on_offer: bool = False
 
+
+
+
 @app.get("/")
 async def read_root():
     try:
-        logger.info("Root endpoint was called")
+        logger.debug("This is a debug message")
+        logger.info("This is an info message")
+        logger.warning("This is a warning message")
+        logger.error("This is an error message")
+        logger.critical("This is a critical message")
         return {"hello": "world"}
     except Exception as e:
         logger.exception("an error occurred in the root endpoint")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/change_logging_level/{level}")
+async def change_logging_level(level: str):
+    if level.upper() in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
+        logger.setLevel(level.upper())
+        return {"message": f"Logging level set to {level.upper()}"}
+    else:
+        return {"message": "Invalid logging level provided. Valid levels are DEBUG, INFO, WARNING, ERROR, CRITICAL"}
 
 @app.post("/item/{item_id}", response_model=Item)
 async def create_item(item_id: int, item:Item):
